@@ -70,7 +70,18 @@ Vagrant.configure(2) do |config|
   # SHELL
 
   config.vm.network :forwarded_port, guest: 5000, host: 5000
-  config.vm.network :forwarded_port, guest: 8080, host: 8080
+  config.vm.network :forwarded_port, guest: 80, host: 8080
 
   config.vm.provision "shell", path: "script/bootstrap.sh", privileged: false
+
+  config.vm.provider :virtualbox do |vb|
+    vb.customize ["modifyvm", :id, "--memory", '3072']
+    vb.customize ["modifyvm", :id, "--ioapic", 'on']
+    vb.customize ["modifyvm", :id, "--cpus", '4']
+    vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+  end
+
+  config.vm.synced_folder "." , "/home/vagrant/redash", nfs: true
+  config.vm.network "private_network", ip: "192.168.50.4"
 end
